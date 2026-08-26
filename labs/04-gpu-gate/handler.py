@@ -5,7 +5,7 @@ may be provisioned. The node reports; the control plane is authoritative —
 a node cannot gate itself.
 
 Gate policy (server-side, configurable via env):
-  any FAIL  -> RMA        (return material authorization: pull the node)
+  any FAIL  -> RMA        (return material authorization: pull the node from the fleet)
   any WARN  -> HOLD       (pending manual review / bandwidth burn test)
   else      -> PROVISION
 
