@@ -1,16 +1,17 @@
-"""gpu-gate — control-plane gate for GPU production onboarding.
+"""gpu-gate: the control plane that decides whether a GPU node onboards.
 
-Receives a raw validation report from a GPU node and DECIDES whether the node
-may be provisioned. The node reports; the control plane is authoritative —
-a node cannot gate itself.
+A GPU node posts its raw validation report here. This Lambda applies the gate
+policy and returns one decision per node: PROVISION, HOLD, or RMA.
 
-Gate policy (server-side, configurable via env):
-  any FAIL  -> RMA        (return material authorization: pull the node from the fleet)
-  any WARN  -> HOLD       (pending manual review / bandwidth burn test)
-  else      -> PROVISION
+The node reports. The gate decides. A node never gates itself.
+
+Gate policy:
+    any FAIL  -> RMA        (return material authorization: pull the node)
+    any WARN  -> HOLD       (pending manual review or a bandwidth burn test)
+    else      -> PROVISION
 
 Every report is appended to DynamoDB as an audit record keyed by
-(node_id, report_ts), so onboarding/RMA decisions are fully traceable.
+(node_id, report_ts), so every onboarding or RMA decision is traceable later.
 """
 
 import json
@@ -25,7 +26,12 @@ table = dynamodb.Table(TABLE)
 
 
 def decide(checks):
-    """Apply gate policy to raw checks. Returns (decision, reasons)."""
+    """Apply the gate policy to a list of checks.
+
+    Returns a tuple of (decision, reasons). Decision is RMA if any check
+    failed, HOLD if any warned, otherwise PROVISION. Reasons is a list of
+    the failing or warning checks so the caller can explain the decision.
+    """
     reasons = []
     statuses = []
     for c in checks:
@@ -35,6 +41,7 @@ def decide(checks):
         statuses.append(st)
         if st in ("FAIL", "WARN"):
             reasons.append(f"{c.get('name')}={c.get('value')} ({st})")
+
     if "FAIL" in statuses:
         return "RMA", reasons
     if "WARN" in statuses:

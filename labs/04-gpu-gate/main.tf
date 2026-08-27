@@ -1,4 +1,4 @@
-# Lab 04 — GPU production onboarding gate (Lambda + DynamoDB + API Gateway)
+# Lab 04, GPU production onboarding gate (Lambda + DynamoDB + API Gateway)
 #
 # Control plane for the GPU validation fleet. A GPU node POSTs its raw
 # validation report to /validate; the Lambda applies the gate policy
@@ -109,7 +109,7 @@ resource "aws_lambda_function" "gate" {
   }
 }
 
-# --- API Gateway (REST API v1 — free LocalStack tier) -----------------
+# --- API Gateway (REST API v1, free LocalStack tier) ------------------
 resource "aws_api_gateway_rest_api" "gate" {
   name        = "cloud-lab-04-gpu-gate-api"
   description = "GPU validation onboarding gate"
@@ -138,7 +138,7 @@ resource "aws_api_gateway_integration" "validate" {
 }
 
 resource "aws_api_gateway_deployment" "gate" {
-  depends_on = [aws_api_gateway_integration.validate]
+  depends_on  = [aws_api_gateway_integration.validate]
   rest_api_id = aws_api_gateway_rest_api.gate.id
   stage_name  = "prod"
 }

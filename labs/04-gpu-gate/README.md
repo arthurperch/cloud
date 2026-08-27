@@ -1,50 +1,57 @@
-# Lab 04 — GPU Production Onboarding Gate
+# GPU Onboarding Gate
 
-Control plane for a GPU validation fleet, built on AWS primitives
-(Lambda + API Gateway + DynamoDB) and run locally on LocalStack.
+The control plane for the GPU validation fleet. A GPU node posts its raw
+validation report here, and this service decides what to do with that node:
+provision it, hold it, or send it back.
 
-## Architecture
+The node reports. The gate decides. A node never gates itself.
 
-```
-[GPU node]  gpu_validate.py ──JSON report──▶ API Gateway POST /validate
-   (NVML checks)                                   │
-                                                   ▼
-                                           Lambda "gpu-gate"
-                                             • parse report
-                                             • DECIDE the gate
-                                             • append audit record
-                                                   │
-                                                   ▼
-                                            DynamoDB "gpu-nodes"
-                                            (node_id, report_ts) history
-```
+## What it is
 
-**Design principle:** the node *reports* raw checks; the control plane
-*decides* the gate. A node cannot gate itself. This mirrors real fleet
-onboarding (and RMA) where approval lives in a central service, not on the box.
+Three AWS services wired together with Terraform, run locally on LocalStack:
 
-## Gate policy
+- **API Gateway** exposes a `POST /validate` endpoint. The GPU node posts its
+  JSON report here.
+- **Lambda** (`handler.py`) reads the report, applies the gate policy, and
+  writes an audit record.
+- **DynamoDB** (`gpu-nodes`) stores every decision, keyed by node id and
+  timestamp, so the whole history of a node is traceable.
+
+## The gate policy
 
 | Report status | Decision | Meaning |
-|---------------|----------|---------|
-| any FAIL      | `RMA`    | return material authorization — pull the node |
-| any WARN      | `HOLD`   | pending manual review / bandwidth burn test |
-| else          | `PROVISION` | onboard into production |
+|---|---|---|
+| any `FAIL` | `RMA` | return material authorization: pull the node |
+| any `WARN` | `HOLD` | pending manual review or a bandwidth burn test |
+| otherwise | `PROVISION` | onboard into production |
+
+The policy is conservative on purpose. A single `FAIL` anywhere means the node
+comes out of the fleet. A `WARN` is not a failure, but it's not a green light
+either, so the node waits for a human or a more thorough test.
+
+## Why the gate lives in a separate repo
+
+The validators run on the GPU node itself. The gate runs in the cloud (or
+LocalStack for local dev). They deploy to different places, so they live in
+different repos. The node side can be shipped to a hundred machines while the
+gate side ships once.
 
 ## Files
 
-- `handler.py` — Lambda: parse + decide + write DynamoDB
-- `main.tf` — DynamoDB table, IAM role/policy, Lambda, API Gateway (REST v1)
-- `verify.sh` — 4 scenarios (PROVISION / RMA / HOLD / 400) + item count
+- `handler.py` - the Lambda. Parse report, decide, write DynamoDB.
+- `main.tf` - Terraform for the DynamoDB table, IAM role and policy, the Lambda
+  function, and the API Gateway REST API.
+- `verify.sh` - four end to end scenarios (PROVISION, RMA, HOLD, and a 400 for
+  malformed input) plus an item count from DynamoDB.
 
-## Run
+## Run it
 
 ```bash
-cloud up                                   # start LocalStack
+cloud up                                          # start LocalStack
 set -a; source ~/lab/cloud/env/localstack.env; set +a
 cd ~/lab/cloud/labs/04-gpu-gate
 terraform init && terraform apply -auto-approve
-./verify.sh                                # end-to-end gate test
+./verify.sh                                       # end to end gate test
 ```
 
 ## Submit a real report from the GPU node
@@ -57,12 +64,12 @@ cd ~/lab/gpu-validation
     --endpoint "http://localhost:4566/restapis/<api_id>/prod/_user_request_/validate"
 ```
 
-## Notes / gotchas
+## Gotchas
 
-- LocalStack free tier does **not** include `apigatewayv2` (HTTP API) — use the
-  classic **REST API v1** resources (`aws_api_gateway_rest_api`, `_resource`,
-  `_method`, `_integration`, `_deployment`).
-- The `*.execute-api.*` domain in `terraform output` does not resolve locally;
-  invoke via `http://localhost:4566/restapis/{id}/{stage}/_user_request_/{path}`.
-- Re-running `terraform apply` with a new stage name forces a fresh deployment;
-  otherwise API Gateway changes may not take effect.
+- LocalStack free tier does not include `apigatewayv2` (the HTTP API). Use the
+  classic REST API v1 resources instead: `aws_api_gateway_rest_api`,
+  `_resource`, `_method`, `_integration`, `_deployment`.
+- The `*.execute-api.*` domain in `terraform output` does not resolve locally.
+  Invoke through `http://localhost:4566/restapis/{id}/{stage}/_user_request_/{path}`.
+- API Gateway changes need a fresh deployment to take effect. Re-running
+  `terraform apply` with a new `stage_name` forces one.

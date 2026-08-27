@@ -15,3 +15,8 @@ override.tf.json
 .idea/
 .vscode/
 localstack-data/
+
+# Build artifacts
+gate.zip
+__pycache__/
+*.pyc
