@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 export AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1
+# Disable the CLI pager: when stdout is a TTY (terminal recorder, CI) the pager
+# mangles the scan output. We always want raw text here.
+export AWS_PAGER=""
 EP="http://localhost:4566"
 # LocalStack serves REST APIs at /restapis/{id}/{stage}/_user_request/{path}
 # (the *.execute-api.* domain from terraform output doesn't resolve locally)
