@@ -1,5 +1,6 @@
 # GPU Onboarding Gate
-<img width="1024" height="820" alt="ascii-art-1787951205978" src="https://github.com/user-attachments/assets/b8fdeff5-8528-4ab7-97f1-03c590216007" />
+<img width="1024" height="820" alt="ascii-art-1787951291179" src="https://github.com/user-attachments/assets/53f0322b-fc00-4958-8299-6a66193ea158" />
+
 Local-first infrastructure work on AWS primitives, run against LocalStack so
 nothing costs money until you want it to. Everything here is written as
 Terraform, tested with real end-to-end scripts, and torn down cleanly.
