@@ -29,9 +29,15 @@ The headline is the GPU onboarding gate. The rest are the building blocks that l
 | `labs/02-dynamodb-crud` | DynamoDB read/write as code. |
 | `labs/01-s3-static` | S3 provisioning with Terraform. |
 
-The full GPU validation story spans two repos. The node side (health checks,
-burn tests, network checks, Ansible) lives in the `gpu-validation` repo. This
-repo is the gate that receives those reports and makes the onboarding call.
+The full GPU validation story spans two repos, one pipeline:
+
+- **Node side** — health checks, burn tests, network checks, Ansible — lives in
+  **[gpu-validation](https://github.com/arthurperch/gpu-validation)**.
+- **Control plane** — this repo — receives those reports and makes the
+  onboarding call.
+
+Start with the node side if you want the whole picture; come back here for the
+decision logic and audit trail.
 
 ## Quick start
 
