@@ -1,4 +1,4 @@
-# cloud
+# GPU Onboarding Gate
 
 Local-first infrastructure work on AWS primitives, run against LocalStack so
 nothing costs money until you want it to. Everything here is written as
@@ -6,8 +6,8 @@ Terraform, tested with real end-to-end scripts, and torn down cleanly.
 
 ## What's in here
 
-The interesting part is the GPU onboarding gate. The rest are the building
-blocks that led up to it.
+The headline is the GPU onboarding gate. The rest are the building blocks that
+led up to it.
 
 | Lab | What it is |
 |---|---|
@@ -58,4 +58,5 @@ See `labs/04-gpu-gate/` for the code and a full walkthrough.
 - AWS CLI v2
 - Terraform
 
-The `cloud` launcher is a small TUI/CLI wrapper around the common commands.
+The `cloud` launcher is a small TUI/CLI wrapper around the common commands
+(the name refers to the local tool, not this repo).
