@@ -1,14 +1,26 @@
 # GPU Onboarding Gate
-<img width="512" height="410" alt="ascii-art-1787951291179" src="https://github.com/user-attachments/assets/26104483-d07c-4425-855c-ddf1e9f6f13f" />
 
-Local-first infrastructure work on AWS primitives, run against LocalStack so
-nothing costs money until you want it to. Everything here is written as
-Terraform, tested with real end-to-end scripts, and torn down cleanly.
+<table>
+  <tr>
+    <td valign="top">
+      <img src="https://github.com/user-attachments/assets/26104483-d07c-4425-855c-ddf1e9f6f13f" alt="ascii-art-1787951291179" style="width: 512px; height: 410px;" />
+    </td>
+    <td valign="top" style="padding-left: 20px; line-height: 1.6;">
+      <h3><b>Local-First Infrastructure</b></h3>
+      <p><b>AWS Primitives</b></p>
+      <p><b>LocalStack Integration</b></p>
+      <p><b>Zero-Cost Development</b></p>
+      <p><b>Pure Terraform Scripts</b></p>
+      <p><b>End-to-End Testing</b></p>
+      <p><b>Clean Environment Teardown</b></p>
+    </td>
+  </tr>
+</table>
+
+Local-first infrastructure work on AWS primitives, run against LocalStack so nothing costs money until you want it to. Everything here is written as Terraform, tested with real end-to-end scripts, and torn down cleanly.
 
 ## What's in here
-
-The headline is the GPU onboarding gate. The rest are the building blocks that
-led up to it.
+The headline is the GPU onboarding gate. The rest are the building blocks that led up to it.
 
 | Lab | What it is |
 |---|---|
