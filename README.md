@@ -6,18 +6,17 @@
       <img src="https://github.com/user-attachments/assets/26104483-d07c-4425-855c-ddf1e9f6f13f" alt="ascii-art-1787951291179" style="width: 512px; height: 410px;" />
     </td>
     <td valign="top" style="padding-left: 20px; line-height: 1.6;">
-      <h3><b>Local-First Infrastructure</b></h3>
-      <p><b>AWS Primitives</b></p>
-      <p><b>LocalStack Integration</b></p>
-      <p><b>Zero-Cost Development</b></p>
-      <p><b>Pure Terraform Scripts</b></p>
-      <p><b>End-to-End Testing</b></p>
-      <p><b>Clean Environment Teardown</b></p>
+      <h3><b>The control plane of GPU onboarding</b></h3>
+      <p><b>Lambda</b> - applies the gate policy</p>
+      <p><b>API Gateway</b> - POST /validate</p>
+      <p><b>DynamoDB</b> - append-only audit trail</p>
+      <p><b>Terraform + LocalStack</b> - run it locally, no AWS bill</p>
+      <p><b>The node reports. The gate decides.</b></p>
     </td>
   </tr>
 </table>
 
-Local-first infrastructure work on AWS primitives, run against LocalStack so nothing costs money until you want it to. Everything here is written as Terraform, tested with real end-to-end scripts, and torn down cleanly.
+Local AWS practice on LocalStack, so nothing costs money until you want it to. Written as Terraform, tested with real scripts, torn down cleanly.
 
 ## What's in here
 The headline is the GPU onboarding gate. The rest are the building blocks that led up to it.
